@@ -56,7 +56,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "me.efesser.flauncher"
+        applicationId "it.lisorect.flauncher.glass"   // own id for this fork (original: me.efesser.flauncher)
         minSdkVersion 21
         targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()

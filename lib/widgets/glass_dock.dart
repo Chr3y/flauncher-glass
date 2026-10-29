@@ -106,10 +106,15 @@ class GlassDock extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           padding: EdgeInsets.symmetric(horizontal: 48, vertical: 24),
           itemCount: entries.length,
+          // Lets a card keep its state (and the "moving" mode) when reordering shifts its index.
+          findChildIndexCallback: (key) {
+            final index = entries.indexWhere((entry) => entry.key == (key as ValueKey<String>).value);
+            return index < 0 ? null : index;
+          },
           itemBuilder: (context, index) {
             final entry = entries[index];
             return EnsureVisible(
-              key: Key("${entry.category.id}-${entry.app.packageName}"),
+              key: ValueKey(entry.key),
               alignment: 0.5,
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 14),
@@ -128,7 +133,8 @@ class GlassDock extends StatelessWidget {
     );
   }
 
-  // Reordering stays within the app's own category.
+  // Reordering stays within the app's own category and is saved on every step,
+  // so leaving the move mode with Back/Home does not lose the new order.
   void _onMove(BuildContext context, AxisDirection direction, _DockEntry entry) {
     int? newIndex;
     if (direction == AxisDirection.right && entry.indexInCategory < entry.categorySize - 1) {
@@ -137,7 +143,9 @@ class GlassDock extends StatelessWidget {
       newIndex = entry.indexInCategory - 1;
     }
     if (newIndex != null) {
-      context.read<AppsService>().reorderApplication(entry.category, entry.indexInCategory, newIndex);
+      final appsService = context.read<AppsService>();
+      appsService.reorderApplication(entry.category, entry.indexInCategory, newIndex);
+      appsService.saveOrderInCategory(entry.category);
     }
   }
 }
@@ -149,4 +157,6 @@ class _DockEntry {
   final int categorySize;
 
   _DockEntry(this.category, this.app, this.indexInCategory, this.categorySize);
+
+  String get key => "${category.id}-${app.packageName}";
 }

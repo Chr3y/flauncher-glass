@@ -16,6 +16,7 @@ tvOS-style "glass" look: a frosted, blurred dock, glowing focus and a calmer hom
 - Build limited to `armeabi-v7a` (the GP01 is 32-bit only) – remove the `abiFilters` block in
   `android/app/build.gradle` for 64-bit devices
 - Own default wallpaper (a simple gradient, part of this project and under the same license)
+- Own application id `it.lisorect.flauncher.glass` – installs next to the original FLauncher
 - Release builds are signed with the debug key – sign with your own key before distributing
 
 The Play Store link below points to the original FLauncher, not to this fork.

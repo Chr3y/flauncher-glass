@@ -50,11 +50,6 @@ class SettingsService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> clearGradientUuid() async {
-    await _sharedPreferences.remove(_gradientUuidKey);
-    notifyListeners();
-  }
-
   Future<void> setGradientUuid(String value) async {
     await _sharedPreferences.setString(_gradientUuidKey, value);
     notifyListeners();

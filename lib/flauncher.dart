@@ -19,6 +19,7 @@
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:flauncher/bundled_wallpapers.dart';
 import 'package:flauncher/custom_traversal_policy.dart';
 import 'package:flauncher/providers/apps_service.dart';
 import 'package:flauncher/providers/settings_service.dart';
@@ -81,13 +82,18 @@ class FLauncher extends StatelessWidget {
   Widget _wallpaper(BuildContext context, Uint8List? wallpaperImage, Gradient? gradient) {
     final size = window.physicalSize;
     if (wallpaperImage != null) {
+      // Decode at screen width: phone photos would otherwise take a lot of memory on the beamer.
       return Image.memory(wallpaperImage,
-          key: Key("background"), fit: BoxFit.cover, height: size.height, width: size.width);
+          key: Key("background"),
+          fit: BoxFit.cover,
+          height: size.height,
+          width: size.width,
+          cacheWidth: size.width.toInt());
     }
     if (gradient != null) {
       return Container(key: Key("background"), decoration: BoxDecoration(gradient: gradient));
     }
-    return Image.asset("assets/wallpaper.jpg",
+    return Image.asset(BundledWallpapers.glass.asset,
         key: Key("background"), fit: BoxFit.cover, height: size.height, width: size.width);
   }
 

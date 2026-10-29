@@ -21,7 +21,9 @@ import 'dart:convert';
 import 'package:flauncher/providers/settings_service.dart';
 import 'package:flauncher/providers/wallpaper_service.dart';
 import 'package:flauncher/widgets/settings/gradient_panel_page.dart';
+import 'package:flauncher/widgets/settings/pictures_panel_page.dart';
 import 'package:flauncher/widgets/settings/unsplash_panel_page.dart';
+import 'package:flauncher/widgets/settings/upload_wallpaper_panel_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -50,12 +52,22 @@ class WallpaperPanelPage extends StatelessWidget {
             autofocus: !context.read<SettingsService>().unsplashEnabled,
             child: Row(
               children: [
-                Icon(Icons.landscape_outlined),
+                Icon(Icons.photo_library_outlined),
                 Container(width: 8),
-                Text("Default", style: Theme.of(context).textTheme.bodyMedium),
+                Text("Pictures", style: Theme.of(context).textTheme.bodyMedium),
               ],
             ),
-            onPressed: () => context.read<WallpaperService>().resetToDefault(),
+            onPressed: () => Navigator.of(context).pushNamed(PicturesPanelPage.routeName),
+          ),
+          TextButton(
+            child: Row(
+              children: [
+                Icon(Icons.qr_code_2),
+                Container(width: 8),
+                Text("Upload from phone", style: Theme.of(context).textTheme.bodyMedium),
+              ],
+            ),
+            onPressed: () => Navigator.of(context).pushNamed(UploadWallpaperPanelPage.routeName),
           ),
           TextButton(
             child: Row(

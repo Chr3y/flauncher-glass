@@ -27,6 +27,8 @@
         android:required="true" />
 
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+    <!-- Local web server for uploading wallpapers from a phone -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <queries>
         <intent>

@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:flauncher/bundled_wallpapers.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -54,9 +55,10 @@ class FLauncherAboutDialog extends StatelessWidget {
               TextSpan(text: "design by "),
               TextSpan(text: "@FXCostanzo", style: underlined),
               TextSpan(text: ".\n\n"),
-              TextSpan(text: "Default wallpaper: \"The Gecko's trail\" by Akyriaz, "),
-              TextSpan(text: "CC BY-SA 4.0", style: underlined),
-              TextSpan(text: ", via Wikimedia Commons (cropped)."),
+              TextSpan(text: "Included wallpapers via Wikimedia Commons (cropped):\n"),
+              ...BundledWallpapers.all
+                  .where((wallpaper) => wallpaper.credit != null)
+                  .map((wallpaper) => TextSpan(text: "• ${wallpaper.credit}\n")),
             ],
           ),
         )

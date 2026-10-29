@@ -19,11 +19,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flauncher/bundled_wallpapers.dart';
 import 'package:flauncher/flauncher_channel.dart';
 import 'package:flauncher/gradients.dart';
 import 'package:flauncher/providers/settings_service.dart';
 import 'package:flauncher/unsplash_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -35,8 +37,17 @@ class WallpaperService extends ChangeNotifier {
 
   late final File _wallpaperFile;
   Uint8List? _wallpaper;
+  Directory? _picturesDirectory;
+  List<File> _pictures = [];
 
   Uint8List? get wallpaperBytes => _wallpaper;
+
+  /// Folder for the user's own wallpapers: filled by the phone upload or via
+  /// `adb push <image> /sdcard/Android/data/<package>/files/Wallpapers/`.
+  Directory? get picturesDirectory => _picturesDirectory;
+
+  /// Images in [picturesDirectory], newest first.
+  List<File> get pictures => _pictures;
 
   FLauncherGradient get gradient => FLauncherGradients.all.firstWhere(
         (gradient) => gradient.uuid == _settingsService.gradientUuid,
@@ -56,6 +67,45 @@ class WallpaperService extends ChangeNotifier {
       _wallpaper = await _wallpaperFile.readAsBytes();
       notifyListeners();
     }
+    final externalDirectory = await getExternalStorageDirectory();
+    _picturesDirectory = Directory("${(externalDirectory ?? directory).path}/Wallpapers");
+    await _picturesDirectory!.create(recursive: true);
+    await refreshPictures();
+  }
+
+  Future<void> refreshPictures() async {
+    final directory = _picturesDirectory;
+    if (directory == null) {
+      return;
+    }
+    final files = await directory
+        .list()
+        .where((entity) => entity is File && _pictureExtensions.any((ext) => entity.path.toLowerCase().endsWith(ext)))
+        .cast<File>()
+        .toList();
+    final modified = {for (final file in files) file.path: await file.lastModified()};
+    files.sort((a, b) => modified[b.path]!.compareTo(modified[a.path]!));
+    _pictures = files;
+    notifyListeners();
+  }
+
+  Future<void> setFromPicture(File picture) async => _setWallpaper(await picture.readAsBytes());
+
+  Future<void> setFromBundled(BundledWallpaper wallpaper) async =>
+      _setWallpaper((await rootBundle.load(wallpaper.asset)).buffer.asUint8List());
+
+  Future<void> deletePicture(File picture) async {
+    if (await picture.exists()) {
+      await picture.delete();
+    }
+    await refreshPictures();
+  }
+
+  Future<void> _setWallpaper(Uint8List bytes) async {
+    await _wallpaperFile.writeAsBytes(bytes);
+    _wallpaper = bytes;
+    await _settingsService.setUnsplashAuthor(null);
+    notifyListeners();
   }
 
   Future<void> pickWallpaper() async {
@@ -93,16 +143,6 @@ class WallpaperService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> resetToDefault() async {
-    if (await _wallpaperFile.exists()) {
-      await _wallpaperFile.delete();
-    }
-    _wallpaper = null;
-    await _settingsService.setUnsplashAuthor(null);
-    await _settingsService.clearGradientUuid();
-    notifyListeners();
-  }
-
   Future<void> setGradient(FLauncherGradient fLauncherGradient) async {
     if (await _wallpaperFile.exists()) {
       await _wallpaperFile.delete();
@@ -113,5 +153,7 @@ class WallpaperService extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+const _pictureExtensions = [".jpg", ".jpeg", ".png", ".webp"];
 
 class NoFileExplorerException implements Exception {}

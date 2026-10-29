@@ -16,8 +16,22 @@ tvOS-style "glass" look: a frosted, blurred dock, glowing focus and a calmer hom
 - Build limited to `armeabi-v7a` (the GP01 is 32-bit only) – remove the `abiFilters` block in
   `android/app/build.gradle` for 64-bit devices
 - Own default wallpaper (a simple gradient, part of this project and under the same license)
+- Wallpaper gallery (*Settings → Wallpaper → Pictures*) with the user's own pictures and a few included photos
+- Upload wallpapers from a phone (*Settings → Wallpaper → Upload from phone*): shows a QR code and PIN; a small web
+  server on the local network runs only while that page is open and accepts JPEG, PNG and WebP (max. 40 MB per upload)
+- Own pictures can also be copied with
+  `adb push <image> /sdcard/Android/data/it.lisorect.flauncher.glass/files/Wallpapers/`
 - Own application id `it.lisorect.flauncher.glass` – installs next to the original FLauncher
 - Release builds are signed with the debug key – sign with your own key before distributing
+
+Included photos in `assets/wallpapers/` (from Wikimedia Commons, cropped to 16:9; their own licenses apply, not the GPL):
+- "The Gecko's trail" by Akyriaz – CC BY-SA 4.0
+- "Drei Zinnen Tre Cime di Lavaredo Dolomites" by Wolfgang Moroder – CC BY-SA 3.0
+- "Odles da Secëda Gherdëina" by Wolfgang Moroder – CC BY-SA 3.0
+- "Lofoten, Norway" by Johannes Groll – CC0
+- "Aurora and perseids" by Stephan Sprinz – CC BY 4.0
+- "Sète's sunset" by Christian Ferrer – CC BY 4.0
+- "Foggy Fanal forest in Seixal, Porto Moniz, Madeira" by Ximonic (Simo Räsänen) – CC BY-SA 4.0
 
 The Play Store link below points to the original FLauncher, not to this fork.
 

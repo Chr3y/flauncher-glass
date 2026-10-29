@@ -21,10 +21,11 @@ import 'package:flauncher/widgets/settings/applications_panel_page.dart';
 import 'package:flauncher/widgets/settings/categories_panel_page.dart';
 import 'package:flauncher/widgets/settings/category_panel_page.dart';
 import 'package:flauncher/widgets/settings/gradient_panel_page.dart';
+import 'package:flauncher/widgets/settings/pictures_panel_page.dart';
 import 'package:flauncher/widgets/settings/settings_panel_page.dart';
 import 'package:flauncher/widgets/settings/unsplash_panel_page.dart';
+import 'package:flauncher/widgets/settings/upload_wallpaper_panel_page.dart';
 import 'package:flauncher/widgets/settings/wallpaper_panel_page.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPanel extends StatefulWidget {
@@ -59,6 +60,10 @@ class _SettingsPanelState extends State<SettingsPanel> {
                     return MaterialPageRoute(builder: (_) => UnsplashPanelPage());
                   case GradientPanelPage.routeName:
                     return MaterialPageRoute(builder: (_) => GradientPanelPage());
+                  case PicturesPanelPage.routeName:
+                    return MaterialPageRoute(builder: (_) => PicturesPanelPage());
+                  case UploadWallpaperPanelPage.routeName:
+                    return MaterialPageRoute(builder: (_) => UploadWallpaperPanelPage());
                   case ApplicationsPanelPage.routeName:
                     return MaterialPageRoute(builder: (_) => ApplicationsPanelPage());
                   case CategoriesPanelPage.routeName:

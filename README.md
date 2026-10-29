@@ -1,3 +1,27 @@
+# FLauncher Glass
+
+**FLauncher Glass** is a fork of [FLauncher](https://gitlab.com/flauncher/flauncher) by Étienne Fesser with a
+tvOS-style "glass" look: a frosted, blurred dock, glowing focus and a calmer home screen. It was built for and tested on a
+**BenQ GP01** projector (Android TV 11, ARM32), but should run on other Android TV devices too.
+
+- Fork maintained by **Matthias Locher** – [Lisorect](https://www.lisorect.it), software development from South Tyrol (Italy)
+- Developed with the help of an AI assistant (Claude by Anthropic); every change was reviewed and tested on a real device
+- License unchanged: **GNU GPL v3** (see `LICENSE`). All credit for the original launcher goes to Étienne Fesser and the
+  FLauncher contributors.
+
+### Changes compared to FLauncher (October 2026)
+- Glass dock (`lib/widgets/glass_dock.dart`): blurred, translucent app row with a glowing focus effect
+- Reworked home screen, clock and settings panels for the glass look
+- Firebase (Analytics, Crashlytics, Remote Config) removed – no tracking, no Google services required
+- Build limited to `armeabi-v7a` (the GP01 is 32-bit only) – remove the `abiFilters` block in
+  `android/app/build.gradle` for 64-bit devices
+- Own default wallpaper (a simple gradient, part of this project and under the same license)
+- Release builds are signed with the debug key – sign with your own key before distributing
+
+The Play Store link below points to the original FLauncher, not to this fork.
+
+---
+
 # FLauncher
 FLauncher is an open-source alternative launcher for Android TV, built with [Flutter](https://flutter.dev).
 

@@ -47,3 +47,6 @@ app.*.map.json
 
 android/app/google-services.json
 coverage/
+
+# Eigenes Foto für den eigenen Beamer – Lizenz ungeklärt, nicht veröffentlichen
+assets/wallpaper-original.jpg

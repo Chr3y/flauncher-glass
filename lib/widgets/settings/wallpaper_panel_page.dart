@@ -50,6 +50,16 @@ class WallpaperPanelPage extends StatelessWidget {
             autofocus: !context.read<SettingsService>().unsplashEnabled,
             child: Row(
               children: [
+                Icon(Icons.landscape_outlined),
+                Container(width: 8),
+                Text("Default", style: Theme.of(context).textTheme.bodyMedium),
+              ],
+            ),
+            onPressed: () => context.read<WallpaperService>().resetToDefault(),
+          ),
+          TextButton(
+            child: Row(
+              children: [
                 Icon(Icons.gradient),
                 Container(width: 8),
                 Text("Gradient", style: Theme.of(context).textTheme.bodyMedium),

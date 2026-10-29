@@ -20,11 +20,10 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flauncher/custom_traversal_policy.dart';
-import 'package:flauncher/database.dart';
 import 'package:flauncher/providers/apps_service.dart';
+import 'package:flauncher/providers/settings_service.dart';
 import 'package:flauncher/providers/wallpaper_service.dart';
-import 'package:flauncher/widgets/apps_grid.dart';
-import 'package:flauncher/widgets/category_row.dart';
+import 'package:flauncher/widgets/glass_dock.dart';
 import 'package:flauncher/widgets/settings/settings_panel.dart';
 import 'package:flauncher/widgets/time_widget.dart';
 import 'package:flutter/material.dart';
@@ -36,18 +35,30 @@ class FLauncher extends StatelessWidget {
         policy: RowByRowTraversalPolicy(),
         child: Stack(
           children: [
-            Consumer<WallpaperService>(
-              builder: (_, wallpaper, __) => _wallpaper(context, wallpaper.wallpaperBytes, wallpaper.gradient.gradient),
+            Consumer2<WallpaperService, SettingsService>(
+              builder: (_, wallpaper, settings, __) => _wallpaper(
+                context,
+                wallpaper.wallpaperBytes,
+                settings.gradientUuid != null ? wallpaper.gradient.gradient : null,
+              ),
             ),
             Scaffold(
               backgroundColor: Colors.transparent,
-              appBar: _appBar(context),
-              body: Padding(
-                padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-                child: Consumer<AppsService>(
-                  builder: (context, appsService, _) => appsService.initialized
-                      ? SingleChildScrollView(child: _categories(appsService.categoriesWithApps))
-                      : _emptyState(context),
+              body: SafeArea(
+                child: Column(
+                  children: [
+                    _topBar(context),
+                    Expanded(
+                      child: Consumer<AppsService>(
+                        builder: (context, appsService, _) => appsService.initialized
+                            ? Align(
+                                alignment: Alignment(0, 0.75),
+                                child: GlassDock(categoriesWithApps: appsService.categoriesWithApps),
+                              )
+                            : _emptyState(context),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -55,70 +66,30 @@ class FLauncher extends StatelessWidget {
         ),
       );
 
-  Widget _categories(List<CategoryWithApps> categoriesWithApps) => Column(
-        children: categoriesWithApps.map((categoryWithApps) {
-          switch (categoryWithApps.category.type) {
-            case CategoryType.row:
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: CategoryRow(
-                    key: Key(categoryWithApps.category.id.toString()),
-                    category: categoryWithApps.category,
-                    applications: categoryWithApps.applications),
-              );
-            case CategoryType.grid:
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: AppsGrid(
-                    key: Key(categoryWithApps.category.id.toString()),
-                    category: categoryWithApps.category,
-                    applications: categoryWithApps.applications),
-              );
-          }
-        }).toList(),
+  Widget _topBar(BuildContext context) => Padding(
+        padding: EdgeInsets.fromLTRB(48, 24, 40, 0),
+        child: Row(
+          children: [
+            TimeWidget(),
+            Spacer(),
+            _SettingsButton(),
+          ],
+        ),
       );
 
-  AppBar _appBar(BuildContext context) => AppBar(
-        actions: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              Positioned(
-                left: 2.0,
-                top: 18.0,
-                child: ImageFiltered(
-                  imageFilter: ImageFilter.blur(sigmaX: 2, sigmaY: 2, tileMode: TileMode.decal),
-                  child: Icon(Icons.settings_outlined, color: Colors.black54),
-                ),
-              ),
-              IconButton(
-                padding: EdgeInsets.all(2),
-                constraints: BoxConstraints(),
-                splashRadius: 20,
-                icon: Icon(Icons.settings_outlined),
-                onPressed: () => showDialog(context: context, builder: (_) => SettingsPanel()),
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 16, right: 32),
-            child: Align(
-              alignment: Alignment.center,
-              child: TimeWidget(),
-            ),
-          ),
-        ],
-      );
-
-  Widget _wallpaper(BuildContext context, Uint8List? wallpaperImage, Gradient gradient) => wallpaperImage != null
-      ? Image.memory(
-          wallpaperImage,
-          key: Key("background"),
-          fit: BoxFit.cover,
-          height: window.physicalSize.height,
-          width: window.physicalSize.width,
-        )
-      : Container(key: Key("background"), decoration: BoxDecoration(gradient: gradient));
+  // Custom wallpaper first, then a gradient the user picked explicitly, otherwise the bundled default.
+  Widget _wallpaper(BuildContext context, Uint8List? wallpaperImage, Gradient? gradient) {
+    final size = window.physicalSize;
+    if (wallpaperImage != null) {
+      return Image.memory(wallpaperImage,
+          key: Key("background"), fit: BoxFit.cover, height: size.height, width: size.width);
+    }
+    if (gradient != null) {
+      return Container(key: Key("background"), decoration: BoxDecoration(gradient: gradient));
+    }
+    return Image.asset("assets/wallpaper.jpg",
+        key: Key("background"), fit: BoxFit.cover, height: size.height, width: size.width);
+  }
 
   Widget _emptyState(BuildContext context) => Center(
         child: Column(
@@ -128,6 +99,38 @@ class FLauncher extends StatelessWidget {
             SizedBox(height: 16),
             Text("Loading...", style: Theme.of(context).textTheme.titleLarge),
           ],
+        ),
+      );
+}
+
+class _SettingsButton extends StatefulWidget {
+  @override
+  _SettingsButtonState createState() => _SettingsButtonState();
+}
+
+class _SettingsButtonState extends State<_SettingsButton> {
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+        customBorder: CircleBorder(),
+        focusColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        onFocusChange: (focused) => setState(() => _focused = focused),
+        onTap: () => showDialog(context: context, builder: (_) => SettingsPanel()),
+        child: AnimatedScale(
+          scale: _focused ? 1.08 : 1.0,
+          duration: Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          child: GlassPanel(
+            focused: _focused,
+            shape: BoxShape.circle,
+            child: Padding(
+              padding: EdgeInsets.all(12),
+              child: Icon(Icons.settings_outlined, color: Colors.white, size: 28),
+            ),
+          ),
         ),
       );
 }

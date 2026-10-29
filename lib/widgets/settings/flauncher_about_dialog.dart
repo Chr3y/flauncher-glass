@@ -53,7 +53,10 @@ class FLauncherAboutDialog extends StatelessWidget {
               TextSpan(text: ", "),
               TextSpan(text: "design by "),
               TextSpan(text: "@FXCostanzo", style: underlined),
-              TextSpan(text: "."),
+              TextSpan(text: ".\n\n"),
+              TextSpan(text: "Default wallpaper: \"The Gecko's trail\" by Akyriaz, "),
+              TextSpan(text: "CC BY-SA 4.0", style: underlined),
+              TextSpan(text: ", via Wikimedia Commons (cropped)."),
             ],
           ),
         )
